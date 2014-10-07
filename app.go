@@ -13,7 +13,7 @@ func main() {
 	db.Connect()
 	
 	// Routes
-	router.HandleFunc("/users/{name}", getUser).Methods("GET")
+	router.HandleFunc("/users/{id}", getUser).Methods("GET")
 
 	n := negroni.New()
 

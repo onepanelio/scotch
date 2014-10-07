@@ -13,7 +13,7 @@ type User struct {
 }
 
 func (u *User) Save() {
-	tx := db.DB.MustBegin()
+	tx := db.MustBegin()
 
 	if u.ID > 0 {
 		tx.NamedExec("UPDATE users SET name = :name, email = :email WHERE id = :id", u)
@@ -27,7 +27,7 @@ func (u *User) Save() {
 func GetUser(ID uint64) User {
 	u := User{}
 
-	err := db.DB.Get(&u, "SELECT * FROM users WHERE id = $1 LIMIT 1", ID)
+	err := db.Get(&u, "SELECT * FROM users WHERE id = $1 LIMIT 1", ID)
 
 	if err != nil {
 		fmt.Println(err)
