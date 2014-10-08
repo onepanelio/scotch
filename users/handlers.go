@@ -1,4 +1,4 @@
-package main
+package users
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/rushtehrani/scotch/lib/response"
 )
 
-func getUser(w http.ResponseWriter, r *http.Request) {
+func Get(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	id, _ := strconv.ParseUint(params["id"], 0, 64)

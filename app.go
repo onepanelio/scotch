@@ -4,7 +4,8 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	
-	"github.com/rushtehrani/scotch/lib/db"
+	"github.com/rushtehrani/scotch/db"
+	"github.com/rushtehrani/scotch/users"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
 	db.Connect()
 	
 	// Routes
-	router.HandleFunc("/users/{id}", getUser).Methods("GET")
+	router.HandleFunc("/users/{id}", users.Get).Methods("GET")
 
 	n := negroni.New()
 

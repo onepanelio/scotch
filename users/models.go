@@ -1,9 +1,9 @@
-package main
+package users
 
 import (
 	"fmt"
 	
-	"github.com/rushtehrani/scotch/lib/db"
+	"github.com/rushtehrani/scotch/db"
 )
 
 type User struct {
