@@ -13,9 +13,18 @@ import (
 func Get(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	ID, _ := strconv.ParseUint(params["id"], 0, 64)
+	id, _ := strconv.ParseUint(params["id"], 0, 64)
 
-	u := GetUser(ID)
+	u, err := GetUser(id)
+	
+	if u == (User{}) {
+		response.Error(w, 404)
+	} 
+		
+	if err != nil {
+		response.Error(w, 500)
+		return
+	}
 
 	response.JSON(w, u)
 }
@@ -36,11 +45,11 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	
 	params := mux.Vars(r)
 
-	ID, _ := strconv.ParseUint(params["id"], 0, 64)
+	id, _ := strconv.ParseUint(params["id"], 0, 64)
 	
 	json.NewDecoder(r.Body).Decode(&u);
 	
-	u.ID = ID
+	u.ID = id
 	u.Save()
 
 	response.JSON(w, u)

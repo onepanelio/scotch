@@ -1,8 +1,6 @@
 package users
 
 import (
-	"fmt"
-	
 	"github.com/rushtehrani/scotch/db"
 )
 
@@ -24,14 +22,10 @@ func (u *User) Save() {
 	tx.Commit()
 }
 
-func GetUser(ID uint64) User {
+func GetUser(ID uint64) (User, error) {
 	u := User{}
 
 	err := db.Get(&u, "SELECT * FROM users WHERE id = $1 LIMIT 1", ID)
 
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return u
+	return u, err
 }
