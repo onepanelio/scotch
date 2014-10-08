@@ -15,6 +15,8 @@ func main() {
 	
 	// Routes
 	router.HandleFunc("/users/{id}", users.Get).Methods("GET")
+	router.HandleFunc("/users/", users.Create).Methods("POST")
+	router.HandleFunc("/users/{id}", users.Update).Methods("PUT")
 
 	n := negroni.New()
 

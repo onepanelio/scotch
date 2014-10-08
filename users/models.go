@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	ID    uint64 `json:"id" db:"id"`
+	ID    uint64 `json:"id,omitempty" db:"id"`
 	Name  string `json:"name,omitempty" db:"name"`
 	Email string `json:"email,omitempty" db:"email"`
 }
