@@ -47,6 +47,8 @@ func Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
+	var err error
+	
 	params := mux.Vars(r)
 
 	id, _ := strconv.ParseInt(params["id"], 0, 64)
@@ -66,7 +68,12 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&u);
 	
 	u.ID = id
-	u.Save()
+	err = u.Save()
+	
+	if err != nil {
+		response.Error(w, 500)
+		return
+	}
 
 	response.JSON(w, u)
 }
