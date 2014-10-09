@@ -13,12 +13,13 @@ import (
 func Get(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	id, _ := strconv.ParseUint(params["id"], 0, 64)
+	id, _ := strconv.ParseInt(params["id"], 0, 64)
 
 	u, err := GetUser(id)
 	
 	if u == (User{}) {
 		response.Error(w, 404)
+		return
 	} 
 		
 	if err != nil {
@@ -35,17 +36,32 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	
 	json.NewDecoder(r.Body).Decode(&u);
 
-	u.Save()
+	err := u.Save()
+	
+	if err != nil {
+		response.Error(w, 500)
+		return
+	}
 
 	response.JSON(w, u)
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
-	var u User
-	
 	params := mux.Vars(r)
 
-	id, _ := strconv.ParseUint(params["id"], 0, 64)
+	id, _ := strconv.ParseInt(params["id"], 0, 64)
+	
+	u, err := GetUser(id)
+	
+	if u == (User{}) {
+		response.Error(w, 404)
+		return
+	} 
+		
+	if err != nil {
+		response.Error(w, 500)
+		return
+	}
 	
 	json.NewDecoder(r.Body).Decode(&u);
 	

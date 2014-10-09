@@ -1,28 +1,39 @@
 package users
 
 import (
+	"fmt"
+	
+	"github.com/jmoiron/sqlx"
+	
 	"github.com/rushtehrani/scotch/db"
 )
 
 type User struct {
-	ID    uint64 `json:"id,omitempty" db:"id"`
+	ID    int64 `json:"id,omitempty" db:"id"`
 	Name  string `json:"name,omitempty" db:"name"`
 	Email string `json:"email,omitempty" db:"email"`
 }
 
-func (u *User) Save() {
-	tx := db.MustBegin()
-
+func (u *User) Save() error {
+	var (
+		err error
+		rows *sqlx.Rows
+	)
+	
 	if u.ID > 0 {
-		tx.NamedExec("UPDATE users SET name = :name, email = :email WHERE id = :id", u)
+		_, err = db.NamedExec("UPDATE users SET name = :name, email = :email WHERE id = :id", u)
 	} else {
-		tx.NamedExec("INSERT INTO users (name, email) VALUES (:name, :email)", u)
+		rows, err = db.NamedQuery("INSERT INTO users (name, email) VALUES (:name, :email) RETURNING id", u)
+		
+		if rows.Next() {
+    		rows.Scan(&u.ID)
+		}
 	}
-
-	tx.Commit()
+	
+	return err
 }
 
-func GetUser(ID uint64) (User, error) {
+func GetUser(ID int64) (User, error) {
 	u := User{}
 
 	err := db.Get(&u, "SELECT * FROM users WHERE id = $1 LIMIT 1", ID)
