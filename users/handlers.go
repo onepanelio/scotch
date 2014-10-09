@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/rushtehrani/scotch/lib/response"
+	"github.com/rushtehrani/scotch/common/response"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -31,11 +31,19 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
-	var u User
+	var (
+		u   User
+		err error
+	)
 
-	json.NewDecoder(r.Body).Decode(&u)
+	err = json.NewDecoder(r.Body).Decode(&u)
 
-	err := u.Save()
+	if err != nil {
+		response.Error(w, 400)
+		return
+	}
+
+	err = u.Save()
 
 	if err != nil {
 		response.Error(w, 500)
@@ -64,7 +72,12 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewDecoder(r.Body).Decode(&u)
+	err = json.NewDecoder(r.Body).Decode(&u)
+
+	if err != nil {
+		response.Error(w, 400)
+		return
+	}
 
 	u.ID = id
 	err = u.Save()

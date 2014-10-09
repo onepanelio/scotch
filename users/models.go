@@ -3,7 +3,7 @@ package users
 import (
 	"github.com/jmoiron/sqlx"
 
-	"github.com/rushtehrani/scotch/db"
+	"github.com/rushtehrani/scotch/common/db"
 )
 
 type User struct {

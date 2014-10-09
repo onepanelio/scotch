@@ -4,14 +4,14 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	
-	"github.com/rushtehrani/scotch/db"
+	"github.com/rushtehrani/scotch/common/db"
 	"github.com/rushtehrani/scotch/users"
 )
 
 func main() {
 	router := mux.NewRouter()
 	
-	db.Connect()
+	db.MustConnect()
 	
 	// Routes
 	router.HandleFunc("/users/{id}", users.Get).Methods("GET")
