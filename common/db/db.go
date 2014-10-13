@@ -9,8 +9,8 @@ import (
 
 var db *sqlx.DB
 
-func MustConnect() {
-	db = sqlx.MustConnect("postgres", "user=postgres password=scotch dbname=scotch sslmode=disable")
+func MustConnect(driverName, dataSourceName string) {
+	db = sqlx.MustConnect(driverName, dataSourceName)
 }
 
 func Get(dest interface{}, query string, args ...interface{}) error {
