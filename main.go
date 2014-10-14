@@ -2,19 +2,19 @@ package main
 
 import (
 	"os"
-	
-	"github.com/rushtehrani/scotch/common/cfg"
+
 	"github.com/rushtehrani/scotch/common/app"
+	"github.com/rushtehrani/scotch/common/cfg"
 	"github.com/rushtehrani/scotch/common/db"
 	"github.com/rushtehrani/scotch/users"
 )
 
 func main() {
-	
-	// Configuration
+
+	// Configuration - cfg vars should only be set during application startup
 	cfg.Set("db.driverName", "postgres")
 	cfg.Set("db.dataSourceName", os.Getenv("DB_DATA_SOURCE_NAME"))
-	
+
 	// Database
 	db.MustConnect(cfg.Get("db.driverName"), cfg.Get("db.dataSourceName"))
 
@@ -26,5 +26,5 @@ func main() {
 	app.Post("/users/", users.Create)
 	app.Put("/users/{id}", users.Update)
 
-	app.Serve(":8080")
+	app.Listen(":" + os.Getenv("PORT"))
 }

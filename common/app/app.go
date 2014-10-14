@@ -22,7 +22,7 @@ func (a *App) Use(constructors ...alice.Constructor) {
 	a.chain.Append(constructors...)
 }
 
-func (a *App) Serve(addr string) {
+func (a *App) Listen(addr string) {
 	http.Handle("/", a.chain.Then(a))
 
 	l := log.New(os.Stdout, "[app] ", 0)
