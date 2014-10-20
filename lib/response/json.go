@@ -5,11 +5,11 @@ import (
 	"net/http"
 )
 
-func JSON(w http.ResponseWriter, val interface{}) {
-	js, err := json.Marshal(val)
+func JSON(w http.ResponseWriter, v interface{}) {
+	js, err := json.Marshal(v)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		Error(w, 500)
 		return
 	}
 

@@ -2,16 +2,20 @@ package users
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 
-	"github.com/rushtehrani/scotch/common/response"
+	"github.com/rushtehrani/scotch/lib/response"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+
+	fmt.Println(context.Get(r, "User"))
 
 	id, _ := strconv.ParseInt(params["id"], 0, 64)
 

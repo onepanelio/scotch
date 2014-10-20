@@ -19,15 +19,11 @@ func New() *App {
 }
 
 func (a *App) Use(constructors ...alice.Constructor) {
-	a.chain.Append(constructors...)
+	a.chain = a.chain.Append(constructors...)
 }
 
-func (a *App) Listen(addr string) {
-	http.Handle("/", a.chain.Then(a))
-
-	l := log.New(os.Stdout, "[app] ", 0)
-	l.Printf("listening on %s", addr)
-	l.Fatal(http.ListenAndServe(addr, nil))
+func (a *App) Head(path string, f func(http.ResponseWriter, *http.Request)) {
+	a.HandleFunc(path, f).Methods("Head")
 }
 
 func (a *App) Get(path string, f func(http.ResponseWriter, *http.Request)) {
@@ -40,4 +36,20 @@ func (a *App) Post(path string, f func(http.ResponseWriter, *http.Request)) {
 
 func (a *App) Put(path string, f func(http.ResponseWriter, *http.Request)) {
 	a.HandleFunc(path, f).Methods("PUT")
+}
+
+func (a *App) Delete(path string, f func(http.ResponseWriter, *http.Request)) {
+	a.HandleFunc(path, f).Methods("DELETE")
+}
+
+func (a *App) Options(path string, f func(http.ResponseWriter, *http.Request)) {
+	a.HandleFunc(path, f).Methods("OPTIONS")
+}
+
+func (a *App) Listen(addr string) {
+	http.Handle("/", a.chain.Then(a))
+
+	l := log.New(os.Stdout, "[app] ", 0)
+	l.Printf("listening on %s", addr)
+	l.Fatal(http.ListenAndServe(addr, nil))
 }
