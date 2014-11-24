@@ -1,13 +1,13 @@
 package auth
 
 import (
-	"net/http"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/context"
-    
-    "github.com/rushtehrani/scotch/cfg"
+
+	"github.com/rushtehrani/scotch/cfg"
 	"github.com/rushtehrani/scotch/lib/response"
 )
 
@@ -25,8 +25,8 @@ func defaultFailureHandler(w http.ResponseWriter, r *http.Request) {
 	response.Error(w, 401)
 }
 
-func NewHandler(h http.Handler) http.Handler {
-    var err error
+func New(h http.Handler) http.Handler {
+	var err error
 
 	privateKey, err = ioutil.ReadFile(cfg.Get("auth.privateKeyPath"))
 
@@ -39,7 +39,7 @@ func NewHandler(h http.Handler) http.Handler {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	return &AuthHandler{successHandler: h, failureHandler: http.HandlerFunc(defaultFailureHandler)}
 }
 

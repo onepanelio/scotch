@@ -6,7 +6,7 @@ import (
 	"github.com/rushtehrani/scotch/app"
 	"github.com/rushtehrani/scotch/cfg"
 	"github.com/rushtehrani/scotch/db"
-	"github.com/rushtehrani/scotch/middleware/auth"
+	//"github.com/rushtehrani/scotch/middleware/auth"
 	"github.com/rushtehrani/scotch/users"
 )
 
@@ -26,7 +26,7 @@ func main() {
 	// Application
 	app := app.New()
 
-	app.Use(auth.NewHandler)
+	//app.Use(auth.New)
 
 	// Routes
 	app.Get("/users/{id}", users.Get)
