@@ -8,7 +8,7 @@ import (
 
 func JSON(w http.ResponseWriter, v interface{}, code ...int) {
 	if reflect.TypeOf(v).String() == "map[string][]error" {
-		v = makeJSONFriendly(v.(map[string][]error))
+		v = convertErrorToString(v.(map[string][]error))
 	}
 
 	js, err := json.Marshal(v)
@@ -27,7 +27,7 @@ func JSON(w http.ResponseWriter, v interface{}, code ...int) {
 	w.Write(js)
 }
 
-func makeJSONFriendly(errs map[string][]error) map[string][]string {
+func convertErrorToString(errs map[string][]error) map[string][]string {
 	ferr := make(map[string][]string)
 
 	for k, v := range errs {
