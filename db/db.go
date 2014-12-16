@@ -3,6 +3,8 @@ package db
 import (
 	"reflect"
 	"database/sql"
+	"regexp"
+	"errors"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -30,41 +32,62 @@ func NamedExec(query string, arg interface{}) (sql.Result, error) {
 	return db.NamedExec(query, arg)
 }
 
-
-func Insert(query string, arg interface{}, primaryKey *int64) error {
-	execHook("PreInsert", arg)
+func Insert(query string, entity interface{}, entityPrimaryKey interface{}) error {
 	
-	rows, err := db.NamedQuery(query, arg) 
+	if !isValidStatement("INSERT", query) {
+		return errors.New("Not a valid INSERT statement.")
+	}
+	
+	execHook("PreInsert", entity)
+	
+	rows, err := db.NamedQuery(query, entity) 
 	
 	if err != nil {
 		return err
 	}
 
 	if rows.Next() {
-		rows.Scan(primaryKey)
+		rows.Scan(entityPrimaryKey)
 	}
 	
-	execHook("PostInsert", arg)
+	execHook("PostInsert", entity)
 	
 	return nil
 }
 
-func Update(query string, arg interface{}) error {
-	execHook("PreUpdate", arg)
+func Update(query string, entity interface{}) error {
 	
-	_, err := db.NamedExec(query, arg)
+	if !isValidStatement("UPDATE", query) {
+		return errors.New("Not a valid UPDATE statement.")
+	}
+	
+	execHook("PreUpdate", entity)
+	
+	_, err := db.NamedExec(query, entity)
 	
 	if err != nil {
 		return err
 	}
 	
-	execHook("PostUpdate", arg)
+	execHook("PostUpdate", entity)
 	
 	return nil
 }
 
-func execHook(hookType string, v interface{}) {
-	method := reflect.ValueOf(v).MethodByName(hookType)
+func isValidStatement(statementType string, query string) bool {
+	r, _ := regexp.Compile("(i?)" + statementType)
+	
+	loc := r.FindStringIndex(query)
+	
+	if loc == nil || loc[0] != 0 {
+		return false
+	}
+	
+	return true
+}
+
+func execHook(hookType string, entity interface{}) {
+	method := reflect.ValueOf(entity).MethodByName(hookType)
 	
 	if method != (reflect.Value{}) {
 		method.Call([]reflect.Value{})
