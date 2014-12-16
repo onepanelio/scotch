@@ -3,14 +3,9 @@ package response
 import (
 	"encoding/json"
 	"net/http"
-	"reflect"
 )
 
 func JSON(w http.ResponseWriter, v interface{}, code ...int) {
-	if reflect.TypeOf(v).String() == "map[string][]error" {
-		v = convertErrorToString(v.(map[string][]error))
-	}
-
 	js, err := json.Marshal(v)
 
 	if err != nil {
@@ -25,16 +20,4 @@ func JSON(w http.ResponseWriter, v interface{}, code ...int) {
 	}
 
 	w.Write(js)
-}
-
-func convertErrorToString(errs map[string][]error) map[string][]string {
-	ferr := make(map[string][]string)
-
-	for k, v := range errs {
-		for _, err := range v {
-			ferr[k] = append(ferr[k], err.Error())
-		}
-	}
-
-	return ferr
 }
