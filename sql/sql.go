@@ -8,6 +8,28 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+
+func isValidStatement(statementType string, query string) bool {
+    r, _ := regexp.Compile("(i?)" + statementType)
+
+    loc := r.FindStringIndex(query)
+
+    if loc == nil || loc[0] != 0 {
+        return false
+    }
+
+    return true
+}
+
+func execHook(hookType string, entity interface{}) {
+    method := reflect.ValueOf(entity).MethodByName(hookType)
+
+    if method != (reflect.Value{}) {
+        method.Call([]reflect.Value{})
+    }
+}
+
+
 type DB struct {
 	*sqlx.DB
 }
@@ -58,22 +80,48 @@ func (db *DB) Update(query string, entity interface{}) error {
 	return nil
 }
 
-func isValidStatement(statementType string, query string) bool {
-	r, _ := regexp.Compile("(i?)" + statementType)
-
-	loc := r.FindStringIndex(query)
-
-	if loc == nil || loc[0] != 0 {
-		return false
-	}
-
-	return true
+type Tx struct {
+    *sqlx.Tx
 }
 
-func execHook(hookType string, entity interface{}) {
-	method := reflect.ValueOf(entity).MethodByName(hookType)
+func (tx *Tx) Insert(query string, entity interface{}, entityPrimaryKey interface{}) error {
+    if !isValidStatement("INSERT", query) {
+        return errors.New("Not a valid INSERT statement.")
+    }
 
-	if method != (reflect.Value{}) {
-		method.Call([]reflect.Value{})
-	}
+    execHook("PreInsert", entity)
+
+    rows, err := tx.NamedQuery(query, entity)
+
+    if err != nil {
+        return err
+    }
+
+    if rows.Next() {
+        rows.Scan(entityPrimaryKey)
+    }
+
+    execHook("PostInsert", entity)
+
+    return nil
 }
+
+func (tx *Tx) Update(query string, entity interface{}) error {
+    if !isValidStatement("UPDATE", query) {
+        return errors.New("Not a valid UPDATE statement.")
+    }
+
+    execHook("PreUpdate", entity)
+
+    _, err := tx.NamedExec(query, entity)
+
+    if err != nil {
+        return err
+    }
+
+    execHook("PostUpdate", entity)
+
+    return nil
+}
+
+
