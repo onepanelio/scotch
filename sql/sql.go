@@ -8,27 +8,25 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-
 func isValidStatement(statementType string, query string) bool {
-    r, _ := regexp.Compile("(i?)" + statementType)
+	r, _ := regexp.Compile("(i?)" + statementType)
 
-    loc := r.FindStringIndex(query)
+	loc := r.FindStringIndex(query)
 
-    if loc == nil || loc[0] != 0 {
-        return false
-    }
+	if loc == nil || loc[0] != 0 {
+		return false
+	}
 
-    return true
+	return true
 }
 
 func execHook(hookType string, entity interface{}) {
-    method := reflect.ValueOf(entity).MethodByName(hookType)
+	method := reflect.ValueOf(entity).MethodByName(hookType)
 
-    if method != (reflect.Value{}) {
-        method.Call([]reflect.Value{})
-    }
+	if method != (reflect.Value{}) {
+		method.Call([]reflect.Value{})
+	}
 }
-
 
 type DB struct {
 	*sqlx.DB
@@ -40,9 +38,11 @@ func MustConnect(driverName, dataSourceName string) *DB {
 	return &DB{DB: db}
 }
 
-func (db *DB) Insert(query string, entity interface{}, entityPrimaryKey interface{}) error {
+func (db *DB) Insert(query string, entity interface{}) (uint64, error) {
+	var pk uint64
+
 	if !isValidStatement("INSERT", query) {
-		return errors.New("Not a valid INSERT statement.")
+		return 0, errors.New("Not a valid INSERT statement.")
 	}
 
 	execHook("PreInsert", entity)
@@ -50,16 +50,16 @@ func (db *DB) Insert(query string, entity interface{}, entityPrimaryKey interfac
 	rows, err := db.NamedQuery(query, entity)
 
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	if rows.Next() {
-		rows.Scan(entityPrimaryKey)
+		rows.Scan(&pk)
 	}
 
 	execHook("PostInsert", entity)
 
-	return nil
+	return pk, nil
 }
 
 func (db *DB) Update(query string, entity interface{}) error {
@@ -81,47 +81,47 @@ func (db *DB) Update(query string, entity interface{}) error {
 }
 
 type Tx struct {
-    *sqlx.Tx
+	*sqlx.Tx
 }
 
-func (tx *Tx) Insert(query string, entity interface{}, entityPrimaryKey interface{}) error {
-    if !isValidStatement("INSERT", query) {
-        return errors.New("Not a valid INSERT statement.")
-    }
+func (tx *Tx) Insert(query string, entity interface{}) (uint64, error) {
+	var pk uint64
 
-    execHook("PreInsert", entity)
+	if !isValidStatement("INSERT", query) {
+		return 0, errors.New("Not a valid INSERT statement.")
+	}
 
-    rows, err := tx.NamedQuery(query, entity)
+	execHook("PreInsert", entity)
 
-    if err != nil {
-        return err
-    }
+	rows, err := tx.NamedQuery(query, entity)
 
-    if rows.Next() {
-        rows.Scan(entityPrimaryKey)
-    }
+	if err != nil {
+		return 0, err
+	}
 
-    execHook("PostInsert", entity)
+	if rows.Next() {
+		rows.Scan(&pk)
+	}
 
-    return nil
+	execHook("PostInsert", entity)
+
+	return pk, nil
 }
 
 func (tx *Tx) Update(query string, entity interface{}) error {
-    if !isValidStatement("UPDATE", query) {
-        return errors.New("Not a valid UPDATE statement.")
-    }
+	if !isValidStatement("UPDATE", query) {
+		return errors.New("Not a valid UPDATE statement.")
+	}
 
-    execHook("PreUpdate", entity)
+	execHook("PreUpdate", entity)
 
-    _, err := tx.NamedExec(query, entity)
+	_, err := tx.NamedExec(query, entity)
 
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 
-    execHook("PostUpdate", entity)
+	execHook("PostUpdate", entity)
 
-    return nil
+	return nil
 }
-
-
