@@ -38,6 +38,22 @@ func MustConnect(driverName, dataSourceName string) *DB {
 	return &DB{DB: db}
 }
 
+func (db *DB) Get(dest interface{}, query string, args ...interface{}) error {
+	if !isValidStatement("SELECT", query) {
+		return errors.New("Not a valid SELECT statement.")
+	}
+
+	err := db.DB.Get(dest, query, args...)
+
+	if err != nil {
+		return err
+	}
+
+	execHook("PostGet", dest)
+
+	return nil
+}
+
 func (db *DB) Insert(query string, entity interface{}) (uint64, error) {
 	var pk uint64
 
