@@ -73,6 +73,8 @@ func (db *DB) Insert(query string, entity interface{}) (uint64, error) {
 		rows.Scan(&pk)
 	}
 
+	rows.Close()
+
 	execHook("PostInsert", entity)
 
 	return pk, nil
@@ -94,6 +96,26 @@ func (db *DB) Update(query string, entity interface{}) error {
 	execHook("PostUpdate", entity)
 
 	return nil
+}
+
+func (db *DB) MustBegin() *Tx {
+	tx, err := db.Beginx()
+
+	if err != nil {
+		panic(err)
+	}
+
+	return tx
+}
+
+func (db *DB) Beginx() (*Tx, error) {
+	tx, err := db.DB.Beginx()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &Tx{Tx: tx}, err
 }
 
 type Tx struct {
@@ -118,6 +140,8 @@ func (tx *Tx) Insert(query string, entity interface{}) (uint64, error) {
 	if rows.Next() {
 		rows.Scan(&pk)
 	}
+
+	rows.Close()
 
 	execHook("PostInsert", entity)
 
