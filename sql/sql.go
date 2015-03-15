@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"regexp"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -11,7 +12,7 @@ import (
 func isValidStatement(statementType string, query string) bool {
 	r, _ := regexp.Compile("(i?)" + statementType)
 
-	loc := r.FindStringIndex(query)
+	loc := r.FindStringIndex(strings.TrimSpace(query))
 
 	if loc == nil || loc[0] != 0 {
 		return false
