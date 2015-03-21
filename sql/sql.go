@@ -55,11 +55,9 @@ func (db *DB) Get(dest interface{}, query string, args ...interface{}) error {
 	return nil
 }
 
-func (db *DB) Insert(query string, entity interface{}) (uint64, error) {
-	var pk uint64
-
+func (db *DB) Insert(query string, entity interface{}) (*sqlx.Rows, error) {
 	if !isValidStatement("INSERT", query) {
-		return 0, errors.New("Not a valid INSERT statement.")
+		return nil, errors.New("Not a valid INSERT statement.")
 	}
 
 	execHook("PreInsert", entity)
@@ -67,18 +65,12 @@ func (db *DB) Insert(query string, entity interface{}) (uint64, error) {
 	rows, err := db.NamedQuery(query, entity)
 
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-
-	if rows.Next() {
-		rows.Scan(&pk)
-	}
-
-	rows.Close()
 
 	execHook("PostInsert", entity)
 
-	return pk, nil
+	return rows, nil
 }
 
 func (db *DB) Update(query string, entity interface{}) error {
@@ -123,11 +115,9 @@ type Tx struct {
 	*sqlx.Tx
 }
 
-func (tx *Tx) Insert(query string, entity interface{}) (uint64, error) {
-	var pk uint64
-
+func (tx *Tx) Insert(query string, entity interface{}) (*sqlx.Rows, error) {
 	if !isValidStatement("INSERT", query) {
-		return 0, errors.New("Not a valid INSERT statement.")
+		return nil, errors.New("Not a valid INSERT statement.")
 	}
 
 	execHook("PreInsert", entity)
@@ -135,18 +125,12 @@ func (tx *Tx) Insert(query string, entity interface{}) (uint64, error) {
 	rows, err := tx.NamedQuery(query, entity)
 
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-
-	if rows.Next() {
-		rows.Scan(&pk)
-	}
-
-	rows.Close()
 
 	execHook("PostInsert", entity)
 
-	return pk, nil
+	return rows, nil
 }
 
 func (tx *Tx) Update(query string, entity interface{}) error {
