@@ -1,11 +1,11 @@
 package cfg
 
-var cfg = make(map[string]string)
+var cfg = make(map[string]interface{})
 
-func Set(key string, val string) {
+func Set(key string, val interface{}) {
 	cfg[key] = val
 }
 
-func Get(key string) string {
+func Get(key string) interface{} {
 	return cfg[key]
 }
