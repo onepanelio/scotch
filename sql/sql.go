@@ -91,6 +91,20 @@ func (db *DB) Update(query string, entity interface{}) error {
 	return nil
 }
 
+func (db *DB) Delete(query string, args ...interface{}) (*sqlx.Rows, error) {
+	if !isValidStatement("DELETE", query) {
+		return nil, errors.New("Not a valid DELETE statement.")
+	}
+
+	rows, err := db.Queryx(query, args...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return rows, nil
+}
+
 func (db *DB) MustBegin() *Tx {
 	tx, err := db.Beginx()
 
@@ -149,4 +163,18 @@ func (tx *Tx) Update(query string, entity interface{}) error {
 	execHook("PostUpdate", entity)
 
 	return nil
+}
+
+func (tx *Tx) Delete(query string, args ...interface{}) (*sqlx.Rows, error) {
+	if !isValidStatement("DELETE", query) {
+		return nil, errors.New("Not a valid DELETE statement.")
+	}
+
+	rows, err := tx.Queryx(query, args...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return rows, nil
 }

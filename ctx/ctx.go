@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	DB *sql.DB
+	DB          *sql.DB
+	CurrentUser interface{}
 )
 
 func Set(r *http.Request, key, v interface{}) {
