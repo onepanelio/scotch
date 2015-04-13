@@ -39,6 +39,10 @@ func MustConnect(driverName, dataSourceName string) *DB {
 	return &DB{DB: db}
 }
 
+func (db *DB) Unsafe() *DB {
+	return &DB{DB: db.DB.Unsafe()}
+}
+
 func (db *DB) Get(dest interface{}, query string, args ...interface{}) error {
 	if !isValidStatement("SELECT", query) {
 		return errors.New("Not a valid SELECT statement.")

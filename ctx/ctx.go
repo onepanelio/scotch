@@ -4,12 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/context"
-
-	"github.com/rushtehrani/scotch/sql"
 )
 
 var (
-	DB          *sql.DB
 	CurrentUser interface{}
 )
 
