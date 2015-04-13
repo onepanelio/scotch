@@ -29,6 +29,10 @@ func execHook(hookType string, entity interface{}) {
 	}
 }
 
+type Rows struct {
+	*sqlx.Rows
+}
+
 type DB struct {
 	*sqlx.DB
 }
@@ -59,7 +63,7 @@ func (db *DB) Get(dest interface{}, query string, args ...interface{}) error {
 	return nil
 }
 
-func (db *DB) Insert(query string, entity interface{}) (*sqlx.Rows, error) {
+func (db *DB) Insert(query string, entity interface{}) (*Rows, error) {
 	if !isValidStatement("INSERT", query) {
 		return nil, errors.New("Not a valid INSERT statement.")
 	}
@@ -74,7 +78,7 @@ func (db *DB) Insert(query string, entity interface{}) (*sqlx.Rows, error) {
 
 	execHook("PostInsert", entity)
 
-	return rows, nil
+	return &Rows{Rows: rows}, nil
 }
 
 func (db *DB) Update(query string, entity interface{}) error {
@@ -95,7 +99,7 @@ func (db *DB) Update(query string, entity interface{}) error {
 	return nil
 }
 
-func (db *DB) Delete(query string, args ...interface{}) (*sqlx.Rows, error) {
+func (db *DB) Delete(query string, args ...interface{}) (*Rows, error) {
 	if !isValidStatement("DELETE", query) {
 		return nil, errors.New("Not a valid DELETE statement.")
 	}
@@ -106,7 +110,7 @@ func (db *DB) Delete(query string, args ...interface{}) (*sqlx.Rows, error) {
 		return nil, err
 	}
 
-	return rows, nil
+	return &Rows{Rows: rows}, nil
 }
 
 func (db *DB) MustBegin() *Tx {
@@ -133,7 +137,7 @@ type Tx struct {
 	*sqlx.Tx
 }
 
-func (tx *Tx) Insert(query string, entity interface{}) (*sqlx.Rows, error) {
+func (tx *Tx) Insert(query string, entity interface{}) (*Rows, error) {
 	if !isValidStatement("INSERT", query) {
 		return nil, errors.New("Not a valid INSERT statement.")
 	}
@@ -148,7 +152,7 @@ func (tx *Tx) Insert(query string, entity interface{}) (*sqlx.Rows, error) {
 
 	execHook("PostInsert", entity)
 
-	return rows, nil
+	return &Rows{Rows: rows}, nil
 }
 
 func (tx *Tx) Update(query string, entity interface{}) error {
@@ -169,7 +173,7 @@ func (tx *Tx) Update(query string, entity interface{}) error {
 	return nil
 }
 
-func (tx *Tx) Delete(query string, args ...interface{}) (*sqlx.Rows, error) {
+func (tx *Tx) Delete(query string, args ...interface{}) (*Rows, error) {
 	if !isValidStatement("DELETE", query) {
 		return nil, errors.New("Not a valid DELETE statement.")
 	}
@@ -180,5 +184,5 @@ func (tx *Tx) Delete(query string, args ...interface{}) (*sqlx.Rows, error) {
 		return nil, err
 	}
 
-	return rows, nil
+	return &Rows{Rows: rows}, nil
 }
