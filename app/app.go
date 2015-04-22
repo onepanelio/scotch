@@ -1,9 +1,7 @@
 package app
 
 import (
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -46,10 +44,8 @@ func (a *App) Options(path string, f func(http.ResponseWriter, *http.Request)) {
 	a.HandleFunc(path, f).Methods("OPTIONS")
 }
 
-func (a *App) Listen(addr string) {
+func (a *App) Listen(addr string) error {
 	http.Handle("/", a.chain.Then(a))
 
-	l := log.New(os.Stdout, "[app] ", 0)
-	l.Printf("listening on %s", addr)
-	l.Fatal(http.ListenAndServe(addr, nil))
+	return http.ListenAndServe(addr, nil)
 }
