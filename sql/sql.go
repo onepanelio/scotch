@@ -185,16 +185,16 @@ func (tx *Tx) Update(query string, entity interface{}) error {
 	return nil
 }
 
-func (tx *Tx) Delete(query string, args ...interface{}) (*Rows, error) {
+func (tx *Tx) Delete(query string, args ...interface{}) error {
 	if !isValidStatement("DELETE", query) {
-		return nil, errors.New("Not a valid DELETE statement.")
+		return errors.New("Not a valid DELETE statement.")
 	}
 
-	rows, err := tx.Queryx(query, args...)
+	_, err := tx.Exec(query, args...)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &Rows{Rows: rows}, nil
+	return nil
 }
