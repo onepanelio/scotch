@@ -72,6 +72,10 @@ func (db *DB) Insert(query string, entity interface{}) error {
 
 	rows, err := db.NamedQuery(query, entity)
 
+	if err != nil {
+		return err
+	}
+
 	defer rows.Close()
 
 	for rows.Next() {
@@ -151,6 +155,10 @@ func (tx *Tx) Insert(query string, entity interface{}) error {
 	execHook("PreInsert", entity)
 
 	rows, err := tx.NamedQuery(query, entity)
+
+	if err != nil {
+		return err
+	}
 
 	defer rows.Close()
 
