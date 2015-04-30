@@ -21,8 +21,8 @@ func isValidStatement(statementType string, query string) bool {
 	return true
 }
 
-func execHook(hookType string, entity interface{}) {
-	method := reflect.ValueOf(entity).MethodByName(hookType)
+func execHook(hookType string, arg interface{}) {
+	method := reflect.ValueOf(arg).MethodByName(hookType)
 
 	if method != (reflect.Value{}) {
 		method.Call([]reflect.Value{})
@@ -63,14 +63,14 @@ func (db *DB) Get(dest interface{}, query string, args ...interface{}) error {
 	return nil
 }
 
-func (db *DB) Insert(query string, entity interface{}) error {
+func (db *DB) Insert(query string, arg interface{}) error {
 	if !isValidStatement("INSERT", query) {
 		return errors.New("Not a valid INSERT statement.")
 	}
 
-	execHook("PreInsert", entity)
+	execHook("PreInsert", arg)
 
-	rows, err := db.NamedQuery(query, entity)
+	rows, err := db.NamedQuery(query, arg)
 
 	if err != nil {
 		return err
@@ -79,32 +79,32 @@ func (db *DB) Insert(query string, entity interface{}) error {
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.StructScan(entity)
+		err = rows.StructScan(arg)
 	}
 
 	if err != nil {
 		return err
 	}
 
-	execHook("PostInsert", entity)
+	execHook("PostInsert", arg)
 
 	return nil
 }
 
-func (db *DB) Update(query string, entity interface{}) error {
+func (db *DB) Update(query string, arg interface{}) error {
 	if !isValidStatement("UPDATE", query) {
 		return errors.New("Not a valid UPDATE statement.")
 	}
 
-	execHook("PreUpdate", entity)
+	execHook("PreUpdate", arg)
 
-	_, err := db.NamedExec(query, entity)
+	_, err := db.NamedExec(query, arg)
 
 	if err != nil {
 		return err
 	}
 
-	execHook("PostUpdate", entity)
+	execHook("PostUpdate", arg)
 
 	return nil
 }
@@ -147,14 +147,14 @@ type Tx struct {
 	*sqlx.Tx
 }
 
-func (tx *Tx) Insert(query string, entity interface{}) error {
+func (tx *Tx) Insert(query string, arg interface{}) error {
 	if !isValidStatement("INSERT", query) {
 		return errors.New("Not a valid INSERT statement.")
 	}
 
-	execHook("PreInsert", entity)
+	execHook("PreInsert", arg)
 
-	rows, err := tx.NamedQuery(query, entity)
+	rows, err := tx.NamedQuery(query, arg)
 
 	if err != nil {
 		return err
@@ -163,32 +163,32 @@ func (tx *Tx) Insert(query string, entity interface{}) error {
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.StructScan(entity)
+		err = rows.StructScan(arg)
 	}
 
 	if err != nil {
 		return err
 	}
 
-	execHook("PostInsert", entity)
+	execHook("PostInsert", arg)
 
 	return nil
 }
 
-func (tx *Tx) Update(query string, entity interface{}) error {
+func (tx *Tx) Update(query string, arg interface{}) error {
 	if !isValidStatement("UPDATE", query) {
 		return errors.New("Not a valid UPDATE statement.")
 	}
 
-	execHook("PreUpdate", entity)
+	execHook("PreUpdate", arg)
 
-	_, err := tx.NamedExec(query, entity)
+	_, err := tx.NamedExec(query, arg)
 
 	if err != nil {
 		return err
 	}
 
-	execHook("PostUpdate", entity)
+	execHook("PostUpdate", arg)
 
 	return nil
 }
