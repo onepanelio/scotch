@@ -63,22 +63,28 @@ func (db *DB) Get(dest interface{}, query string, args ...interface{}) error {
 	return nil
 }
 
-func (db *DB) Insert(query string, entity interface{}) (*Rows, error) {
+func (db *DB) Insert(query string, entity interface{}) error {
 	if !isValidStatement("INSERT", query) {
-		return nil, errors.New("Not a valid INSERT statement.")
+		return errors.New("Not a valid INSERT statement.")
 	}
 
 	execHook("PreInsert", entity)
 
 	rows, err := db.NamedQuery(query, entity)
 
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.StructScan(entity)
+	}
+
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	execHook("PostInsert", entity)
 
-	return &Rows{Rows: rows}, nil
+	return nil
 }
 
 func (db *DB) Update(query string, entity interface{}) error {
@@ -137,22 +143,28 @@ type Tx struct {
 	*sqlx.Tx
 }
 
-func (tx *Tx) Insert(query string, entity interface{}) (*Rows, error) {
+func (tx *Tx) Insert(query string, entity interface{}) error {
 	if !isValidStatement("INSERT", query) {
-		return nil, errors.New("Not a valid INSERT statement.")
+		return errors.New("Not a valid INSERT statement.")
 	}
 
 	execHook("PreInsert", entity)
 
 	rows, err := tx.NamedQuery(query, entity)
 
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.StructScan(entity)
+	}
+
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	execHook("PostInsert", entity)
 
-	return &Rows{Rows: rows}, nil
+	return nil
 }
 
 func (tx *Tx) Update(query string, entity interface{}) error {
