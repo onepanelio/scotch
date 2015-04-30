@@ -99,18 +99,18 @@ func (db *DB) Update(query string, entity interface{}) error {
 	return nil
 }
 
-func (db *DB) Delete(query string, args ...interface{}) (*Rows, error) {
+func (db *DB) Delete(query string, args ...interface{}) error {
 	if !isValidStatement("DELETE", query) {
-		return nil, errors.New("Not a valid DELETE statement.")
+		return errors.New("Not a valid DELETE statement.")
 	}
 
-	rows, err := db.Queryx(query, args...)
+	_, err := db.Exec(query, args...)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &Rows{Rows: rows}, nil
+	return nil
 }
 
 func (db *DB) MustBegin() *Tx {
