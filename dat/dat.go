@@ -80,9 +80,13 @@ func (db *DB) Insert(query string, arg interface{}) error {
 
 	for rows.Next() {
 		err = rows.StructScan(arg)
+
+		if err != nil {
+			return err
+		}
 	}
 
-	if err != nil {
+	if err = rows.Err(); err != nil {
 		return err
 	}
 
@@ -164,9 +168,13 @@ func (tx *Tx) Insert(query string, arg interface{}) error {
 
 	for rows.Next() {
 		err = rows.StructScan(arg)
+
+		if err != nil {
+			return err
+		}
 	}
 
-	if err != nil {
+	if err = rows.Err(); err != nil {
 		return err
 	}
 
