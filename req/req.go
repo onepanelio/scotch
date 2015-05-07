@@ -16,6 +16,6 @@ func Params(r *http.Request) map[string]string {
 	return mux.Vars(r)
 }
 
-func JSON(r *http.Request) *json.Decoder {
-	return json.NewDecoder(r.Body)
+func JSON(r *http.Request, v interface{}) error {
+	return json.NewDecoder(r.Body).Decode(v)
 }
