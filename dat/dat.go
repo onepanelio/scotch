@@ -29,6 +29,10 @@ func execHook(hookType string, arg interface{}) {
 	}
 }
 
+func In(query string, args ...interface{}) (string, []interface{}, error) {
+	return sqlx.In(query, args)
+}
+
 type Rows struct {
 	*sqlx.Rows
 }
