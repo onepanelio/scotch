@@ -1,9 +1,8 @@
 package ctx
 
 import (
+	"context"
 	"net/http"
-
-	"github.com/gorilla/context"
 )
 
 var (
@@ -11,9 +10,9 @@ var (
 )
 
 func Set(r *http.Request, key, v interface{}) {
-	context.Set(r, key, v)
+	r = r.WithContext(context.WithValue(r.Context(), key, v))
 }
 
 func Get(r *http.Request, key interface{}) interface{} {
-	return context.Get(r, key)
+	return r.Context().Value(key)
 }
