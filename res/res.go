@@ -22,6 +22,11 @@ func JSON(w http.ResponseWriter, v interface{}, code ...int) {
 	w.Write(js)
 }
 
+func SendStatus(w http.ResponseWriter, code int) {
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(code)
+}
+
 func Error(w http.ResponseWriter, code int, m ...string) {
 	message := http.StatusText(code)
 
