@@ -31,4 +31,4 @@
 
 [[constraint]]
   name = "github.com/justinas/alice"
-  version = "1.0.0"
+  revision = "052b8b6c18edb9db317af86806d8e00ebaa94160"

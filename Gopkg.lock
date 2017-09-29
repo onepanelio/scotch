@@ -23,11 +23,10 @@
   name = "github.com/justinas/alice"
   packages = ["."]
   revision = "052b8b6c18edb9db317af86806d8e00ebaa94160"
-  version = "1.0.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4b1675447b14a35b3f514a6946aab2f19c7b059071a74e47a14994d6ccbc5c87"
+  inputs-digest = "1614dbdcb6a7a8dc9a23ab838aa2715fee4bcac27cd90c7b1ff24ff4bf054410"
   solver-name = "gps-cdcl"
   solver-version = 1
