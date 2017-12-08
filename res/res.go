@@ -5,6 +5,16 @@ import (
 	"net/http"
 )
 
+func Text(w http.ResponseWriter, v []byte, code ...int) {
+	w.Header().Set("Content-Type", "text/plain")
+
+	if len(code) > 0 {
+		w.WriteHeader(code[0])
+	}
+
+	w.Write(v)
+}
+
 func JSON(w http.ResponseWriter, v interface{}, code ...int) {
 	js, err := json.Marshal(v)
 
