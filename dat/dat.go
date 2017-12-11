@@ -106,9 +106,21 @@ func (db *DB) Update(query string, arg interface{}) error {
 
 	execHook("PreUpdate", arg)
 
-	_, err := db.NamedExec(query, arg)
-
+	rows, err := db.NamedQuery(query, arg)
 	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.StructScan(arg)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if err = rows.Err(); err != nil {
 		return err
 	}
 
@@ -194,9 +206,21 @@ func (tx *Tx) Update(query string, arg interface{}) error {
 
 	execHook("PreUpdate", arg)
 
-	_, err := tx.NamedExec(query, arg)
-
+	rows, err := tx.NamedQuery(query, arg)
 	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.StructScan(arg)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	if err = rows.Err(); err != nil {
 		return err
 	}
 
